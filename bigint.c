@@ -73,7 +73,9 @@ struct bigint *bigint_read(char *s) {
 }
 
 void bigint_print(struct bigint *b) {
-    for (int i = b->nbuckets - 1; i >= 0; --i)
+    int n = b->nbuckets - 1;
+    printf("%lx", (uint64_t) b->buckets[n]);
+    for (int i = n - 1; i >= 0; --i)
         printf("%0*lx", 2 * (int) sizeof(bucket_t), (uint64_t) b->buckets[i]);
     printf("\n");
 }
