@@ -17,17 +17,17 @@ struct bigint *bigint_new(int nbuckets) {
     return b;
 }
 
+void bigint_free(struct bigint *b) {
+    free(b->buckets);
+    free(b);
+}
+
 static bucket_t hex_digit_value(char d) {
     if (d >= '0' && d <= '9')
         return d - '0';
     d = tolower(d);
     assert(d >= 'a' && d <= 'f');
     return d - 'a' + 10;
-}
-
-void bigint_free(struct bigint *b) {
-    free(b->buckets);
-    free(b);
 }
 
 /* Read a bigint from the given hex string (with no leading "0x").
@@ -76,4 +76,45 @@ void bigint_print(struct bigint *b) {
     for (int i = b->nbuckets - 1; i >= 0; --i)
         printf("%0*lx", 2 * (int) sizeof(bucket_t), (uint64_t) b->buckets[i]);
     printf("\n");
+}
+
+static void bigint_grow(struct bigint *b) {
+    b->nbuckets++;
+    b->buckets = realloc(b->buckets, b->nbuckets * sizeof(bucket_t));
+    assert(b->buckets);
+}
+
+static bucket_t addc(bucket_t *carry, bucket_t b1, bucket_t b2) {
+    bucket_t sum = b1 + *carry;
+    if (sum < b1)
+        *carry = 1;
+    sum += b2;
+    if (sum < b2)
+        *carry = 1;
+    return sum;
+}
+
+struct bigint *bigint_add(struct bigint *b1, struct bigint *b2) {
+    if (b1->nbuckets < b2->nbuckets) {
+        struct bigint *tmp = b1;
+        b1 = b2;
+        b2 = tmp;
+    }
+    struct bigint *b = bigint_new(b1->nbuckets);
+    bucket_t carry = 0;
+    int i;
+    for (i = 0; i < b2->nbuckets; i++)
+        b->buckets[i] =
+            addc(&carry, b1->buckets[i], b2->buckets[i]);
+    for ( ; i < b1->nbuckets; i++) {
+        if (!carry)
+            break;
+        b->buckets[i] =
+            addc(&carry, b1->buckets[i], 0);
+    }
+    if (carry) {
+        bigint_grow(b);
+        b->buckets[i] = carry;
+    }
+    return b;
 }
