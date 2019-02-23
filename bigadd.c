@@ -8,7 +8,7 @@
 /* Type of a bucket. Each bucket contains a piece of the
    integer, in least-significant to most-significant
    order. */
-typedef uint64_t bucket_t;
+typedef uint16_t bucket_t;
 
 struct bigint {
     int nbuckets;
@@ -51,13 +51,20 @@ struct bigint *bigint_read(char *s) {
     /* 0..16 digits = 1 bucket; 17-32 digits = 2 buckets ... */
     int nb = (ns + ds_per_b - 1) / ds_per_b;
     struct bigint *b = bigint_new(nb);
-    /* Index of current bucket. */
+    /* Index of current bucket in units of digits. */
     int di = 0;
-    for (int i = 0; i < nb; i++) {
+    for (int i = nb - 1; i >= 0; --i) {
+        /* Number of digits to process this iteration. The
+           first iteration is "special", since it may not have
+           enough digits. */
+        int d_process = ds_per_b;
+        if (i == nb - 1) {
+            d_process = ns - ds_per_b * (nb - 1);
+        }
         bucket_t d = 0L;
-        for (int j = di; j < di + ds_per_b; j++) {
+        for (int j = di; j < di + d_process; j++) {
             if (j >= ns) {
-                assert(i == nb - 1);
+                assert(i == 0);
                 break;
             }
             char c = s[j];
@@ -69,14 +76,14 @@ struct bigint *bigint_read(char *s) {
             d = (d << 4) | k;
         }
         b->buckets[i] = d;
-        di += ds_per_b;
+        di += d_process;
     }
     return b;
 }
 
 void bigint_print(struct bigint *b) {
     for (int i = b->nbuckets - 1; i >= 0; --i)
-        printf("%016lx", b->buckets[i]);
+        printf("%0*x", 2 * (int) sizeof(bucket_t), b->buckets[i]);
     printf("\n");
 }
 
