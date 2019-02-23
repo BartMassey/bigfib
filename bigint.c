@@ -114,6 +114,7 @@ struct bigint *bigint_add(struct bigint *b1, struct bigint *b2) {
     }
     if (carry) {
         bigint_grow(b);
+        assert(i == b->nbuckets - 1);
         b->buckets[i] = carry;
     }
     return b;
