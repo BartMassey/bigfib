@@ -1,19 +1,10 @@
 #include <assert.h>
 #include <ctype.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* Type of a bucket. Each bucket contains a piece of the
-   integer, in least-significant to most-significant
-   order. */
-typedef uint16_t bucket_t;
-
-struct bigint {
-    int nbuckets;
-    bucket_t *buckets;
-};
+#include "bigint.h"
 
 /* Returns a new bigint structure with nbuckets
    buckets. Buckets are uninitialized */
@@ -26,7 +17,7 @@ struct bigint *bigint_new(int nbuckets) {
     return b;
 }
 
-bucket_t hex_digit_value(char d) {
+static bucket_t hex_digit_value(char d) {
     if (d >= '0' && d <= '9')
         return d - '0';
     d = tolower(d);
@@ -85,12 +76,4 @@ void bigint_print(struct bigint *b) {
     for (int i = b->nbuckets - 1; i >= 0; --i)
         printf("%0*x", 2 * (int) sizeof(bucket_t), b->buckets[i]);
     printf("\n");
-}
-
-int main(int argc, char **argv) {
-    assert(argc == 2);
-    struct bigint *b = bigint_read(argv[1]);
-    assert(b);
-    bigint_print(b);
-    return 0;
 }
