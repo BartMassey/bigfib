@@ -85,11 +85,10 @@ static void bigint_grow(struct bigint *b) {
 }
 
 static bucket_t addc(bucket_t *carry, bucket_t b1, bucket_t b2) {
-    bucket_t sum = b1 + *carry;
-    if (sum < b1)
-        *carry = 1;
-    sum += b2;
-    if (sum < b2)
+    bucket_t sum = b1 + b2 + *carry;
+    if (sum >= b1)
+        *carry = 0;
+    else
         *carry = 1;
     return sum;
 }
@@ -106,12 +105,9 @@ struct bigint *bigint_add(struct bigint *b1, struct bigint *b2) {
     for (i = 0; i < b2->nbuckets; i++)
         b->buckets[i] =
             addc(&carry, b1->buckets[i], b2->buckets[i]);
-    for ( ; i < b1->nbuckets; i++) {
-        if (!carry)
-            break;
+    for ( ; i < b1->nbuckets; i++)
         b->buckets[i] =
             addc(&carry, b1->buckets[i], 0);
-    }
     if (carry) {
         bigint_grow(b);
         assert(i == b->nbuckets - 1);
