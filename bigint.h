@@ -3,7 +3,7 @@
 /* Type of a bucket. Each bucket contains a piece of the
    integer, in least-significant to most-significant
    order. */
-typedef uint16_t bucket_t;
+typedef uint64_t bucket_t;
 
 struct bigint {
     int nbuckets;
