@@ -87,11 +87,24 @@ static void bigint_grow(struct bigint *b) {
 }
 
 static bucket_t addc(bucket_t *carry, bucket_t b1, bucket_t b2) {
-    bucket_t sum = b1 + b2 + *carry;
-    if (sum >= b1)
-        *carry = 0;
-    else
-        *carry = 1;
+    bucket_t cflag = 0;
+    bucket_t sum = b1 + *carry;
+    if (sum < b1)
+        cflag = 1;
+    sum += b2;
+    if (sum < b2)
+        cflag = 1;
+#ifdef DEBUG_ADDC
+    /* This tests that the sum and carry are being computed
+       correctly by computing the 64-bit sum and
+       carry. Requires that the bucket size be less than 64
+       bits to be correct. */
+    assert(sizeof(bucket_t) < sizeof(uint64_t));
+    uint64_t big_sum = b1 + b2 + *carry;
+    assert((bucket_t) big_sum == sum);
+    assert((big_sum >> (8 * sizeof(bucket_t))) == cflag);
+#endif
+    *carry = cflag;
     return sum;
 }
 
