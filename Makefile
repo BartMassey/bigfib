@@ -1,5 +1,12 @@
 CC = gcc
-CDEBUG = -g
+
+# For debugging
+#  CDEBUG = -g
+# For profiling
+#  CDEBUG = -fno-inline -O4 -pg
+# For optimization
+CDEBUG = -O4
+
 CFLAGS = -Wall -Wextra -Werror $(CDEBUG)
 
 OBJS = bigfib.o bigint.o bigadd.o
