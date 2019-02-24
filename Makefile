@@ -1,5 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g
+CDEBUG = -g
+CFLAGS = -Wall -Wextra -Werror $(CDEBUG)
 
 OBJS = bigfib.o bigint.o bigadd.o
 BINS = bigfib bigadd
@@ -15,4 +16,7 @@ bigadd: bigadd.o bigint.o
 $(OBJS): bigint.h
 
 clean:
-	-rm -f $(OBJS) $(BINS)
+	-rm -f $(OBJS) $(BINS) *.s gmon.out
+
+.c.s:
+	$(CC) $(CFLAGS) -S $*.c

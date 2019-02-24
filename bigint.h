@@ -2,7 +2,7 @@
 
 /* Type of a bucket. Each bucket contains a piece of the
    integer, in least-significant to most-significant
-   order. */
+   order. This type can be any unsigned integer type. */
 typedef uint64_t bucket_t;
 
 struct bigint {
