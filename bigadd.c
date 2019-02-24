@@ -8,6 +8,9 @@ int main(int argc, char **argv) {
     struct bigint *b2 = bigint_read(argv[2]);
     assert(b2);
     struct bigint *b = bigint_add(b1, b2);
+    bigint_free(b1);
+    bigint_free(b2);
     bigint_print(b);
+    bigint_free(b);
     return 0;
 }
