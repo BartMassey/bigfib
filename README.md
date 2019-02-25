@@ -63,7 +63,7 @@ primitive used in `bignum_add`.
 ## PSU CS 201 HW 4
 
 Please see
-[`README-HW4.md`](/BartMassey/blob/master/README-HW4.md) for
+[`README-HW4.md`](README-HW4.md) for
 the homework assignment related to this code.
 
 ## License
