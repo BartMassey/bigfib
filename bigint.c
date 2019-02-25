@@ -119,7 +119,44 @@ static void bigint_grow(struct bigint *b) {
    addition.  On output, *carry will be either 0 or 1
    depending on whether this addition had a carry. The
    result of the addition (up to carry) is returned. */
-static bucket_t addc(bucket_t *carry, bucket_t b1, bucket_t b2) {
+
+
+#ifdef ADDC_ASM_JMP
+
+/* Assembly implementation of the C code, works only for
+   bucket_t == uint64_t. */
+extern bucket_t addc_asm_jmp(bucket_t *carry, bucket_t b1, bucket_t b2) {
+    assert(sizeof(bucket_t) == 8);
+    bucket_t sum;
+    uint64_t cin = *carry;
+    uint64_t cout;
+    asm(
+        "xorq	%1, %1\n\t"
+        "movq	%2, %0\n\t"
+        "addq	%4, %0\n\t"
+        "jnb	.L%=0\n\t"
+        "movq	$1, %1\n"
+        ".L%=0:\n\t"
+        "addq	%3, %0\n\t"
+        "jnb	.L%=1\n\t"
+        "movq	$1, %1\n"
+        ".L%=1:\n"
+        : "=&rm" (sum), "=&rm"(cout)
+        : "rm" (b1), "rm" (b2), "r" (cin)
+        : "cc"
+    );
+
+    /* Save output carry and return result. */
+    *carry = cout;
+    return sum;
+}
+
+#endif
+
+#ifdef ADDC_C
+
+/* Pure C implementation, works for any bucket size. */
+extern bucket_t addc_c(bucket_t *carry, bucket_t b1, bucket_t b2) {
     /* Output carry flag value. */
     bucket_t cflag = 0;
 
@@ -149,6 +186,8 @@ static bucket_t addc(bucket_t *carry, bucket_t b1, bucket_t b2) {
     *carry = cflag;
     return sum;
 }
+
+#endif
 
 /* Add b1 and b2, returning a newly-allocated bignum result.
    Neither b1 nor b2 are freed by this operation. */
@@ -181,11 +220,11 @@ struct bigint *bigint_add(struct bigint *b1, struct bigint *b2) {
     /* Add common buckets. */
     for (i = 0; i < b2->nbuckets; i++)
         b->buckets[i] =
-            addc(&carry, b1->buckets[i], b2->buckets[i]);
+            ADDC(&carry, b1->buckets[i], b2->buckets[i]);
     /* Propagate carry and copy the rest of b1. */
     for ( ; i < b1->nbuckets; i++)
         b->buckets[i] =
-            addc(&carry, b1->buckets[i], 0);
+            ADDC(&carry, b1->buckets[i], 0);
     /* Handle carry-out. */
     if (carry) {
         bigint_grow(b);

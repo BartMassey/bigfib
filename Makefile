@@ -1,5 +1,6 @@
 CC = gcc
 
+# Compiler flags.
 # For debugging
 #  CDEBUG = -g
 # For profiling
@@ -7,10 +8,16 @@ CC = gcc
 # For optimization
 CDEBUG = -O4
 
-CFLAGS = -Wall -Wextra -Werror $(CDEBUG)
+# Which addc() to use. Pick one.
+# For C version
+#   ADDC = -DADDC_C
+# For asm version using jmp
+ADDC = -DADDC_ASM_JMP
 
-OBJS = bigfib.o bigint.o bigadd.o
-BINS = bigfib bigadd
+CFLAGS = -Wall -Wextra -Werror $(CDEBUG) $(ADDC)
+
+OBJS = bigfib.o bigint.o bigadd.o unit.o
+BINS = bigfib bigadd unit
 
 all: $(BINS)
 
@@ -19,6 +26,9 @@ bigfib: bigfib.o bigint.o
 
 bigadd: bigadd.o bigint.o
 	$(CC) $(CFLAGS) -o bigadd bigadd.o bigint.o
+
+unit: unit.o bigint.o
+	$(CC) $(CFLAGS) -o unit unit.o bigint.o
 
 $(OBJS): bigint.h
 
