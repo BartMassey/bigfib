@@ -55,3 +55,17 @@ for testing and comparison purposes.
     $ python3 bigfib.py 200
     338864a5c1caeb07d0ef067cb83df17e395
 
+### unit
+
+There is a unit test app. It currently only tests the `ADDC`
+primitive used in `bignum_add`.
+
+## PSU CS 201 HW 4
+
+Please see `README-HW4.md` for the homework assignment
+related to this code.
+
+## License
+
+This code is available under the "MIT License". Please see
+the file `LICENSE` in this distribution for license terms.
