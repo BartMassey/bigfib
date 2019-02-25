@@ -186,6 +186,19 @@ When you have everything working, compare the run time of
 old `ADDC` and with `Python`. I found that my new one was
 substantially faster.
 
+## Hints
+
+* The documentation for GCC inline assembly starts
+  [here](https://gcc.gnu.org/onlinedocs/gcc-4.4.4/gcc/Extended-Asm.html#Extended-Asm).
+
+* There are several tutorials linked from the lecture notes
+  on using GDB for machine-level debugging.
+
+* The only thing you might have to change about the C code
+  of your `addc_asm_adc()` is the types of some of the
+  variables. (Hint: which instruction listed above requires
+  an 8-bit operand?)
+
 ## Writeup
 
 Your submission *must* include a writeup in a text file
