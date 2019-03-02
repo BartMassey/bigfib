@@ -10,9 +10,9 @@ CDEBUG = -O4
 
 # Which addc() to use. Pick one.
 # For C version
-#   ADDC = -DADDC_C
+ADDC = -DADDC_C
 # For asm version using jmp
-ADDC = -DADDC_ASM_JMP
+#  ADDC = -DADDC_ASM_JMP
 
 CFLAGS = -Wall -Wextra -Werror $(CDEBUG) $(ADDC)
 
